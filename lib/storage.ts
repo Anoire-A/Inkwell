@@ -7,7 +7,8 @@ export interface Entry {
   text: string;
   words: number;
   goal: number;
-  completed: boolean;
+  completed: boolean; // reached the word goal
+  submitted: boolean; // the writer pressed "Finish for today"
 }
 
 const KEY = "inkwell:entries";
@@ -15,7 +16,9 @@ const KEY = "inkwell:entries";
 export function loadEntries(): Entry[] {
   try {
     const raw = localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as Entry[]) : [];
+    const parsed = raw ? (JSON.parse(raw) as Entry[]) : [];
+    // Entries saved before the submit button existed count as submitted if they hit the goal.
+    return parsed.map((e) => ({ ...e, submitted: e.submitted ?? e.completed }));
   } catch {
     return [];
   }

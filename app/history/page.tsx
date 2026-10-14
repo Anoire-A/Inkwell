@@ -15,37 +15,43 @@ export default function HistoryPage() {
   }, []);
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-10">
-      <Link href="/write" className="text-sm opacity-70 hover:opacity-100">
-        ← Back to writing
-      </Link>
+    <main className="mx-auto max-w-2xl px-6 py-12">
+      <p className="text-xs uppercase tracking-[0.2em] text-muted">Archive</p>
+      <h1 className="mt-2 font-serif text-4xl">My works</h1>
 
-      <h1 className="mt-4 text-3xl font-semibold">Your history</h1>
-
-      {entries === null && <p className="mt-6 opacity-70">Loading…</p>}
+      {entries === null && <p className="mt-8 text-muted">Loading…</p>}
 
       {entries?.length === 0 && (
-        <p className="mt-6 opacity-70">
-          Nothing here yet. Write something and it will show up.
-        </p>
+        <div className="mt-8 rounded-lg border border-line p-8 text-center">
+          <p className="text-muted">Nothing here yet.</p>
+          <Link
+            href="/write"
+            className="mt-4 inline-block rounded-full bg-fg px-5 py-2 text-sm font-medium text-bg hover:opacity-80"
+          >
+            Write something
+          </Link>
+        </div>
       )}
 
-      <ul className="mt-6 space-y-4">
+      <ul className="mt-8 space-y-5">
         {entries?.map((e) => (
           <li
             key={`${e.date}-${e.category}`}
-            className="rounded-lg border border-gray-400 p-4"
+            className="rounded-lg border border-line p-6"
           >
-            <div className="flex items-center justify-between text-sm">
-              <span className="opacity-70">
+            <div className="flex items-center justify-between text-xs uppercase tracking-wider text-muted">
+              <span>
                 {e.date} · {e.category}
               </span>
               <span>
-                {e.words}/{e.goal} words {e.completed ? "✅" : ""}
+                {e.words}/{e.goal} words ·{" "}
+                {e.submitted ? "Submitted" : "Draft"}
               </span>
             </div>
-            <p className="mt-2 text-sm italic opacity-70">{e.prompt}</p>
-            <p className="mt-2 whitespace-pre-wrap">{e.text}</p>
+            <p className="mt-3 font-serif italic text-muted">{e.prompt}</p>
+            <p className="mt-3 whitespace-pre-wrap font-serif text-lg leading-relaxed">
+              {e.text}
+            </p>
           </li>
         ))}
       </ul>
