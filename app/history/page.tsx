@@ -85,7 +85,7 @@ export default function HistoryPage() {
                 {e.title || "Untitled"}
               </h2>
             )}
-            {e.kind === "daily" && (
+            {e.prompt && (
               <p className="mt-3 font-serif italic text-muted">{e.prompt}</p>
             )}
 

@@ -5,13 +5,14 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { dateKey } from "@/lib/daily-prompt";
 import { deleteEntry, getEntry, saveEntry } from "@/lib/storage";
+import { Suspense } from "react";
 
 function countWords(text: string): number {
   const trimmed = text.trim();
   return trimmed ? trimmed.split(/\s+/).length : 0;
 }
 
-export default function ComposePage() {
+function ComposeEditor() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const id = params.id;
@@ -126,5 +127,13 @@ export default function ComposePage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function ComposePage() {
+  return (
+    <Suspense fallback={null}>
+      <ComposeEditor />
+    </Suspense>
   );
 }

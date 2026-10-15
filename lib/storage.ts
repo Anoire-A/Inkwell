@@ -12,6 +12,7 @@ export interface Entry {
   goal: number;
   completed: boolean; // reached the word goal
   submitted: boolean; // finished by the writer
+  sprintMinutes?: number; // set when the piece was written in a sprint
 }
 
 const KEY = "inkwell:entries";
@@ -37,6 +38,7 @@ function normalize(e: Partial<Entry>): Entry {
     goal: e.goal ?? 0,
     completed: e.completed ?? false,
     submitted: e.submitted ?? e.completed ?? false,
+    sprintMinutes: e.sprintMinutes,
   };
 }
 

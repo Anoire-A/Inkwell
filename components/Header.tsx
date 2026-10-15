@@ -7,6 +7,8 @@ import ThemeToggle from "@/components/ThemeToggle";
 const LINKS = [
   { href: "/write", match: "/write", label: "Today" },
   { href: "/compose/new", match: "/compose", label: "Free write" },
+  { href: "/sprint", match: "/sprint", label: "Sprint" },
+  { href: "/stats", match: "/stats", label: "Stats" },
   { href: "/history", match: "/history", label: "My works" },
 ];
 
@@ -15,11 +17,11 @@ export default function Header() {
 
   return (
     <header className="border-b border-line">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-y-2 px-6 py-4">
         <Link href="/" className="font-serif text-xl tracking-tight">
           Inkwell
         </Link>
-        <nav className="flex items-center gap-5 text-sm sm:gap-6">
+        <nav className="flex flex-wrap items-center gap-4 text-sm sm:gap-6">
           {LINKS.map((l) => (
             <Link
               key={l.href}
