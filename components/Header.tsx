@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/components/SyncProvider";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const LINKS = [
@@ -14,6 +15,7 @@ const LINKS = [
 
 export default function Header() {
   const pathname = usePathname();
+  const { loading, user } = useAuth();
 
   return (
     <header className="border-b border-line">
@@ -35,6 +37,16 @@ export default function Header() {
               {l.label}
             </Link>
           ))}
+          <Link
+            href="/account"
+            className={`rounded-full border px-3 py-1 text-xs ${
+              pathname.startsWith("/account")
+                ? "border-fg text-fg"
+                : "border-line text-muted hover:text-fg"
+            } ${loading ? "opacity-0" : ""}`}
+          >
+            {user ? "Account" : "Sign in"}
+          </Link>
           <ThemeToggle />
         </nav>
       </div>

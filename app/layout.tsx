@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
-import { Suspense } from "react";
+import SyncProvider from "@/components/SyncProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces" });
@@ -29,10 +30,12 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-screen antialiased">
-        <Suspense fallback={<div className="h-[57px] border-b border-line" />}>
-          <Header />
-        </Suspense>
-        {children}
+        <SyncProvider>
+          <Suspense fallback={<div className="h-[57px] border-b border-line" />}>
+            <Header />
+          </Suspense>
+          {children}
+        </SyncProvider>
       </body>
     </html>
   );

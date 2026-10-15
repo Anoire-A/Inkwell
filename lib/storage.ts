@@ -13,9 +13,16 @@ export interface Entry {
   completed: boolean; // reached the word goal
   submitted: boolean; // finished by the writer
   sprintMinutes?: number; // set when the piece was written in a sprint
+  updatedAt?: number; // ms since 1970; the newer copy wins when syncing
+}
+
+export interface ChangeDetail {
+  type: "save" | "delete";
+  id: string;
 }
 
 const KEY = "inkwell:entries";
+export const CHANGE_EVENT = "inkwell:local-change";
 
 export function dailyId(date: string, category: Category): string {
   return `daily-${date}-${category}`;
@@ -39,6 +46,7 @@ function normalize(e: Partial<Entry>): Entry {
     completed: e.completed ?? false,
     submitted: e.submitted ?? e.completed ?? false,
     sprintMinutes: e.sprintMinutes,
+    updatedAt: e.updatedAt ?? 0,
   };
 }
 
@@ -60,6 +68,17 @@ function writeEntries(entries: Entry[]): void {
   }
 }
 
+// Tells the sync layer that something changed and needs uploading.
+function emit(type: ChangeDetail["type"], id: string): void {
+  try {
+    window.dispatchEvent(
+      new CustomEvent<ChangeDetail>(CHANGE_EVENT, { detail: { type, id } })
+    );
+  } catch {
+    // not in a browser; nothing to notify
+  }
+}
+
 export function getEntry(id: string): Entry | undefined {
   return loadEntries().find((e) => e.id === id);
 }
@@ -67,10 +86,26 @@ export function getEntry(id: string): Entry | undefined {
 // Saves (or updates) an entry. Empty entries are not kept.
 export function saveEntry(entry: Entry): void {
   const entries = loadEntries().filter((e) => e.id !== entry.id);
-  if (entry.text.trim()) entries.push(entry);
+  if (entry.text.trim()) entries.push({ ...entry, updatedAt: Date.now() });
   writeEntries(entries);
+  emit("save", entry.id);
 }
 
 export function deleteEntry(id: string): void {
   writeEntries(loadEntries().filter((e) => e.id !== id));
+  emit("delete", id);
+}
+
+// The two functions below are for the sync layer. They don't emit events,
+// so they never trigger an upload.
+export function replaceEntries(entries: Entry[]): void {
+  writeEntries(entries);
+}
+
+export function clearLocalEntries(): void {
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    // ignore
+  }
 }
