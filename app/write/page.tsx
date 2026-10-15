@@ -8,7 +8,7 @@ import {
   getDailyPrompt,
   type Category,
 } from "@/lib/daily-prompt";
-import { loadEntries, saveEntry } from "@/lib/storage";
+import { dailyId, loadEntries, saveEntry } from "@/lib/storage";
 import { calculateStreak } from "@/lib/streak";
 
 const GOALS = [100, 250, 500];
@@ -40,9 +40,7 @@ export default function WritePage() {
     if (!today) return;
     const entries = loadEntries();
     const key = dateKey(today);
-    const existing = entries.find(
-      (e) => e.date === key && e.category === category
-    );
+    const existing = entries.find((e) => e.id === dailyId(key, category));
     setText(existing?.text ?? "");
     setSubmitted(existing?.submitted ?? false);
     if (existing) setGoal(existing.goal);
@@ -65,8 +63,11 @@ export default function WritePage() {
     if (!today || !prompt) return;
     const w = countWords(nextText);
     saveEntry({
+      id: dailyId(dateKey(today), category),
+      kind: "daily",
       date: dateKey(today),
       category,
+      title: "",
       prompt: prompt.text,
       text: nextText,
       words: w,

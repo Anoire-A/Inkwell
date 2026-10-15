@@ -4,7 +4,9 @@ import type { Entry } from "@/lib/storage";
 // Consecutive days with at least one submitted entry.
 // If today isn't finished yet, the streak is still alive from yesterday.
 export function calculateStreak(entries: Entry[], today: Date): number {
-  const done = new Set(entries.filter((e) => e.submitted).map((e) => e.date));
+  const done = new Set(
+  entries.filter((e) => e.submitted && e.kind === "daily").map((e) => e.date)
+);
   const cursor = new Date(today);
 
   if (!done.has(dateKey(cursor))) {

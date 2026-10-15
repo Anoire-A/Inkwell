@@ -5,8 +5,9 @@ import { usePathname } from "next/navigation";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const LINKS = [
-  { href: "/write", label: "Today" },
-  { href: "/history", label: "My works" },
+  { href: "/write", match: "/write", label: "Today" },
+  { href: "/compose/new", match: "/compose", label: "Free write" },
+  { href: "/history", match: "/history", label: "My works" },
 ];
 
 export default function Header() {
@@ -18,13 +19,13 @@ export default function Header() {
         <Link href="/" className="font-serif text-xl tracking-tight">
           Inkwell
         </Link>
-        <nav className="flex items-center gap-6 text-sm">
+        <nav className="flex items-center gap-5 text-sm sm:gap-6">
           {LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               className={
-                pathname.startsWith(l.href)
+                pathname.startsWith(l.match)
                   ? "text-fg underline underline-offset-8"
                   : "text-muted hover:text-fg"
               }
