@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/compose/new", match: "/compose", label: "Free write" },
   { href: "/sprint", match: "/sprint", label: "Sprint" },
   { href: "/stats", match: "/stats", label: "Stats" },
+  { href: "/ideas", match: "/ideas", label: "Ideas" },
   { href: "/history", match: "/history", label: "My works" },
 ];
 

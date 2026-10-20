@@ -2,12 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-  CATEGORIES,
-  dateKey,
-  getDailyPrompt,
-  type Category,
-} from "@/lib/daily-prompt";
+import { getTodaysPrompt } from "@/lib/community";
+import { CATEGORIES, dateKey, type Category } from "@/lib/daily-prompt";
 import { dailyId, loadEntries, saveEntry } from "@/lib/storage";
 import { calculateStreak } from "@/lib/streak";
 
@@ -27,24 +23,40 @@ export default function WritePage() {
   const [submitted, setSubmitted] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
   const [focus, setFocus] = useState(false);
+  const [promptText, setPromptText] = useState("");
 
   // Date is set after mount so the server and browser don't disagree.
   useEffect(() => {
     setToday(new Date());
   }, []);
 
-  const prompt = today ? getDailyPrompt(category, today) : null;
-
-  // Load today's saved entry whenever the day or category changes.
+  // Load today's entry, and today's prompt if you haven't started yet.
   useEffect(() => {
     if (!today) return;
+    let cancelled = false;
+
     const entries = loadEntries();
-    const key = dateKey(today);
-    const existing = entries.find((e) => e.id === dailyId(key, category));
+    const existing = entries.find(
+      (e) => e.id === dailyId(dateKey(today), category)
+    );
     setText(existing?.text ?? "");
     setSubmitted(existing?.submitted ?? false);
     if (existing) setGoal(existing.goal);
     setStreak(calculateStreak(entries, today));
+
+    if (existing?.prompt) {
+      // Once you've written something, the prompt you started with stays.
+      setPromptText(existing.prompt);
+    } else {
+      setPromptText("");
+      getTodaysPrompt(category, today).then((p) => {
+        if (!cancelled) setPromptText(p);
+      });
+    }
+
+    return () => {
+      cancelled = true;
+    };
   }, [today, category]);
 
   // Escape closes focus mode or the celebration.
@@ -60,7 +72,7 @@ export default function WritePage() {
   }, []);
 
   function persist(nextText: string, nextGoal: number, nextSubmitted: boolean) {
-    if (!today || !prompt) return;
+    if (!today || !promptText) return;
     const w = countWords(nextText);
     saveEntry({
       id: dailyId(dateKey(today), category),
@@ -68,7 +80,7 @@ export default function WritePage() {
       date: dateKey(today),
       category,
       title: "",
-      prompt: prompt.text,
+      prompt: promptText,
       text: nextText,
       words: w,
       goal: nextGoal,
@@ -171,14 +183,14 @@ export default function WritePage() {
             <p className="text-xs uppercase tracking-[0.2em] text-muted">
               Prompt
             </p>
-            <p className="mt-1 font-serif text-xl leading-snug">
-              {prompt ? prompt.text : "Loading…"}
+            <p className="mt-1 whitespace-pre-line font-serif text-xl leading-snug">
+              {promptText || "Loading…"}
             </p>
           </div>
 
           <textarea
             value={text}
-            readOnly={submitted}
+            readOnly={submitted || !promptText}
             onChange={(e) => handleTextChange(e.target.value)}
             placeholder="Start writing…"
             className={`mt-6 w-full resize-none rounded-lg border border-line bg-bg p-5 font-serif text-lg leading-relaxed focus:border-fg focus:outline-none ${
@@ -240,6 +252,13 @@ export default function WritePage() {
               </div>
             )}
           </div>
+
+          <p className="mt-8 text-center text-xs text-muted">
+            Have a prompt idea?{" "}
+            <Link href="/ideas" className="underline underline-offset-4 hover:text-fg">
+              Submit it for other writers
+            </Link>
+          </p>
         </div>
       </section>
 
@@ -270,10 +289,10 @@ export default function WritePage() {
             </p>
             <div className="mt-6 flex justify-center gap-3">
               <Link
-                href="/history"
+                href="/ideas"
                 className="rounded-full bg-fg px-5 py-2 text-sm font-medium text-bg hover:opacity-80"
               >
-                View my works
+                Submit a prompt idea
               </Link>
               <button
                 onClick={() => setCelebrating(false)}

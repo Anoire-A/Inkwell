@@ -86,7 +86,7 @@ export default function HistoryPage() {
               </h2>
             )}
             {e.prompt && (
-              <p className="mt-3 font-serif italic text-muted">{e.prompt}</p>
+              <p className="mt-3 whitespace-pre-line font-serif italic text-muted">{e.prompt}</p>
             )}
 
             <p className="mt-3 whitespace-pre-wrap font-serif text-lg leading-relaxed">
